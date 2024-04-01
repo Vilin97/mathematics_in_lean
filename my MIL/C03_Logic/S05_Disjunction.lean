@@ -126,4 +126,3 @@ example (P : Prop) : ¬¬P → P := by
 
 example (P Q : Prop) : P → Q ↔ ¬P ∨ Q := by
   sorry
-
