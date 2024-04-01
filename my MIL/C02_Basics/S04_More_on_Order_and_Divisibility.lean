@@ -50,7 +50,20 @@ example : min (min a b) c = min a (min b c) := by
 theorem aux : min a b + c ≤ min (a + c) (b + c) := by
   sorry
 example : min a b + c = min (a + c) (b + c) := by
-  sorry
+  apply le_antisymm
+  . apply aux
+  -- . rw [← add_neg_cancel_right (min (a+c) (b+c)) (-c)]
+  have : min (a + c) (b + c) -c ≤ min a b := by
+    apply le_min
+    -- apply sub_left_le_of_le_add
+    -- rw [add_comm c a]
+    -- exact min_le_left (a + c) (b + c)
+    have : min (a + c) (b + c) ≤ a + c := min_le_left (a + c) (b + c)
+    linarith
+    have : min (a + c) (b + c) ≤ b + c := min_le_right (a + c) (b + c)
+    linarith
+  linarith
+
 #check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
 
 example : |a| - |b| ≤ |a - b| := by

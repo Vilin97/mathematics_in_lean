@@ -45,6 +45,16 @@ example : x ⊔ y = y ⊔ x := by
   sorry
 
 example : x ⊔ y ⊔ z = x ⊔ (y ⊔ z) := by
+  apply le_antisymm
+  . apply sup_le
+    apply sup_le
+    exact le_sup_left
+    calc
+      y ≤ y ⊔ z := le_sup_left
+      _ ≤ x ⊔ (y ⊔ z) := le_sup_right
+    calc
+      z ≤ y ⊔ z := le_sup_right
+      _ ≤ x ⊔ (y ⊔ z) := le_sup_right
   sorry
 
 theorem absorb1 : x ⊓ (x ⊔ y) = x := by
