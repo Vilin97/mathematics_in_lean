@@ -103,8 +103,7 @@ example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x := by
 example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f x + g x :=
   fun a b aleb ↦ add_le_add (mf aleb) (mg aleb)
 
-example {c : ℝ} (mf : Monotone f) (nnc : 0 ≤ c) : Monotone fun x ↦ c * f x :=
-  sorry
+example {c : ℝ} (mf : Monotone f) (nnc : 0 ≤ c) : Monotone fun x ↦ c * f x := fun a b aleb ↦ mul_le_mul_of_nonneg_left (mf aleb) nnc
 
 example (mf : Monotone f) (mg : Monotone g) : Monotone fun x ↦ f (g x) :=
   sorry
@@ -143,8 +142,7 @@ example : s ⊆ s := by
 
 theorem Subset.refl : s ⊆ s := fun x xs ↦ xs
 
-theorem Subset.trans : r ⊆ s → s ⊆ t → r ⊆ t := by
-  sorry
+theorem Subset.trans : r ⊆ s → s ⊆ t → r ⊆ t := fun rs st x hx => st (rs hx)
 
 end
 
@@ -168,8 +166,11 @@ example (c : ℝ) : Injective fun x ↦ x + c := by
   intro x₁ x₂ h'
   exact (add_left_inj c).mp h'
 
-example {c : ℝ} (h : c ≠ 0) : Injective fun x ↦ c * x := by
-  sorry
+example {c : ℝ} (h : c ≠ 0) : Injective fun x ↦ c * x := fun x y hxy => (mul_right_inj' h).1 hxy
+  -- by
+  -- intro x y hxy
+  -- dsimp at hxy
+  -- apply (mul_right_inj' h).1 hxy
 
 variable {α : Type*} {β : Type*} {γ : Type*}
 variable {g : β → γ} {f : α → β}

@@ -12,8 +12,7 @@ variable (a b c d : ℝ)
 
 example : min a b = min b a := by
   apply le_antisymm
-  · show min a b ≤ min b a
-    apply le_min
+  · apply le_min
     · apply min_le_right
     apply min_le_left
   · show min b a ≤ min a b
@@ -39,7 +38,13 @@ example : min a b = min b a := by
     apply min_le_left
 
 example : max a b = max b a := by
-  sorry
+  apply ge_antisymm
+  repeat
+    apply max_le
+    . apply le_max_right
+    . apply le_max_left
+
+
 example : min (min a b) c = min a (min b c) := by
   sorry
 theorem aux : min a b + c ≤ min (a + c) (b + c) := by
@@ -48,8 +53,9 @@ example : min a b + c = min (a + c) (b + c) := by
   sorry
 #check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
 
-example : |a| - |b| ≤ |a - b| :=
-  sorry
+example : |a| - |b| ≤ |a - b| := by
+  nth_rw 1 [← sub_add_cancel a b]
+  linarith [abs_add (a-b) b]
 end
 
 section
@@ -66,7 +72,15 @@ example : x ∣ x ^ 2 := by
   apply dvd_mul_left
 
 example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
-  sorry
+  apply dvd_add
+  apply dvd_add
+  . rw [← mul_assoc]
+    rw [mul_comm y x]
+    rw [mul_assoc]
+    exact dvd_mul_right x (y*z)
+  . apply dvd_mul_left
+  . rw [pow_two]
+    apply dvd_trans h (dvd_mul_left w w)
 end
 
 section
@@ -80,5 +94,3 @@ variable (m n : ℕ)
 example : Nat.gcd m n = Nat.gcd n m := by
   sorry
 end
-
-

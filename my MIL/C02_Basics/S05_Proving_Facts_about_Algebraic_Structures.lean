@@ -36,7 +36,7 @@ variable (x y z : α)
 #check (sup_le : x ≤ z → y ≤ z → x ⊔ y ≤ z)
 
 example : x ⊓ y = y ⊓ x := by
-  sorry
+  rw [inf_comm]
 
 example : x ⊓ y ⊓ z = x ⊓ (y ⊓ z) := by
   sorry
@@ -48,7 +48,14 @@ example : x ⊔ y ⊔ z = x ⊔ (y ⊔ z) := by
   sorry
 
 theorem absorb1 : x ⊓ (x ⊔ y) = x := by
-  sorry
+  apply le_antisymm
+  . exact inf_le_left
+  . apply le_inf
+    rfl
+    exact le_sup_left
+
+
+#check le_antisymm
 
 theorem absorb2 : x ⊔ x ⊓ y = x := by
   sorry
@@ -106,7 +113,10 @@ variable (x y z : X)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
 
 example (x y : X) : 0 ≤ dist x y := by
-  sorry
+  have : 0 ≤ dist x y + dist x y := calc
+    0 = dist x x := by rw [dist_self x]
+    _ ≤ dist x y + dist y x := by exact dist_triangle x y x
+    _ = dist x y + dist x y := by rw [dist_comm]
+  linarith
 
 end
-
