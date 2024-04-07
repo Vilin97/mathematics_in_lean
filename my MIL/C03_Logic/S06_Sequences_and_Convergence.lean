@@ -35,7 +35,12 @@ theorem convergesTo_add {s t : ℕ → ℝ} {a b : ℝ}
   rcases cs (ε / 2) ε2pos with ⟨Ns, hs⟩
   rcases ct (ε / 2) ε2pos with ⟨Nt, ht⟩
   use max Ns Nt
-  sorry
+  intro n hn
+  calc
+    |s n + t n - (a + b)| = |(s n - a) + (t n - b)| := by ring
+    _ ≤ |s n - a| + |t n - b| := abs_add (s n - a) (t n - b)
+    _ < ε := by linarith [hs n (le_of_max_le_left hn), ht n (le_of_max_le_right hn)]
+
 
 theorem convergesTo_mul_const {s : ℕ → ℝ} {a : ℝ} (c : ℝ) (cs : ConvergesTo s a) :
     ConvergesTo (fun n ↦ c * s n) (c * a) := by
@@ -46,7 +51,20 @@ theorem convergesTo_mul_const {s : ℕ → ℝ} {a : ℝ} (c : ℝ) (cs : Conver
     rw [h]
     ring
   have acpos : 0 < |c| := abs_pos.mpr h
-  sorry
+  intro ε hε
+  specialize cs (ε/|c|) (div_pos hε acpos)
+  rcases cs with ⟨N, h'⟩
+  use N
+  intro n hn
+  specialize h' n hn
+  dsimp
+  calc
+    |c * s n - c * a| = |c * (s n - a)| := by ring
+    _ = |c| * |s n - a| := abs_mul c (s n - a)
+    _ < |c| * (ε / |c|) := by exact (mul_lt_mul_left acpos).mpr h'
+    _ = |c| * ε / |c| := by exact mul_div |c| ε |c|
+    _ = ε := mul_div_cancel_left ε (by exact abs_ne_zero.mpr h)
+
 
 theorem exists_abs_le_of_convergesTo {s : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) :
     ∃ N b, ∀ n, N ≤ n → |s n| < b := by
@@ -100,4 +118,3 @@ def ConvergesTo' (s : α → ℝ) (a : ℝ) :=
   ∀ ε > 0, ∃ N, ∀ n ≥ N, |s n - a| < ε
 
 end
-
