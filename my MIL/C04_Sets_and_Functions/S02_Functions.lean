@@ -34,7 +34,14 @@ example : s ⊆ f ⁻¹' (f '' s) := by
   use x, xs
 
 example : f '' s ⊆ v ↔ s ⊆ f ⁻¹' v := by
-  sorry
+  constructor
+  intro h x xs
+  apply h
+  use x
+  intro h y ys
+  rcases ys with ⟨x, xs, hx⟩
+  rw [← hx]
+  exact (h xs)
 
 example (h : Injective f) : f ⁻¹' (f '' s) ⊆ s := by
   sorry
@@ -145,8 +152,7 @@ variable (P : α → Prop) (h : ∃ x, P x)
 
 #check Classical.choose h
 
-example : P (Classical.choose h) :=
-  Classical.choose_spec h
+example : P (Classical.choose h) := Classical.choose_spec h
 
 noncomputable section
 
@@ -163,8 +169,24 @@ variable (f : α → β)
 
 open Function
 
-example : Injective f ↔ LeftInverse (inverse f) f :=
-  sorry
+#check LeftInverse
+#print LeftInverse
+#print RightInverse
+variable (x : α) (hx : ∃ x', f x' = f x)
+variable (y : β) (hy : ∃ x, f x = y)
+#check hx
+#check inverse_spec (f x) hx -- cryptic error
+-- #check @inverse_spec f (f x) hx -- cryptic error
+-- #check inverse_spec y hy -- works
+
+example : Injective f ↔ LeftInverse (inverse f) f := by
+  constructor
+  . intro h x
+    apply h
+    have hx : ∃ x', f x' = f x := by use x
+    rw [inverse_spec (f x) hx]
+  . intro h x y hxy
+    rw [← h x, ← h y, hxy]
 
 example : Surjective f ↔ RightInverse (inverse f) f :=
   sorry
@@ -183,10 +205,10 @@ theorem Cantor : ∀ f : α → Set α, ¬Surjective f := by
     intro h'
     have : j ∉ f j := by rwa [h] at h'
     contradiction
-  have h₂ : j ∈ S
-  sorry
-  have h₃ : j ∉ S
-  sorry
+  have h₂ : j ∈ S := h₁
+  have h₃ : j ∉ S := by
+    rw [← h]
+    exact h₁
   contradiction
 
 -- COMMENTS: TODO: improve this
