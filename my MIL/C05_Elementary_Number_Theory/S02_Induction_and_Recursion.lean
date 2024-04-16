@@ -48,8 +48,20 @@ theorem dvd_fac {i n : ℕ} (ipos : 0 < i) (ile : i ≤ n) : i ∣ fac n := by
 
 theorem pow_two_le_fac (n : ℕ) : 2 ^ (n - 1) ≤ fac n := by
   rcases n with _ | n
-  · simp [fac]
-  sorry
+  · simp only [Nat.zero_eq, ge_iff_le, zero_le, tsub_eq_zero_of_le, pow_zero, fac, le_refl]
+  . induction' n with n h
+    . simp only [Nat.zero_eq, Nat.reduceSucc, ge_iff_le, le_refl, tsub_eq_zero_of_le, pow_zero, fac,
+      zero_add, mul_one]
+    . simp only [Nat.succ_sub_succ_eq_sub, tsub_zero] at *
+      calc
+        2 ^ (n + 1) = 2 * 2 ^ n := Nat.pow_succ'
+        _ ≤ (n + 2) * 2 ^ n := by
+          rw [mul_le_mul_right (by norm_num)]
+          norm_num
+        _ ≤ (n + 2) * fac (n + 1) := by
+          rw [mul_le_mul_left (by norm_num)]
+          exact h
+        _ = fac (n+2) := rfl
 section
 
 variable {α : Type*} (s : Finset ℕ) (f : ℕ → ℕ) (n : ℕ)
