@@ -112,7 +112,16 @@ theorem sum_id (n : ℕ) : ∑ i in range (n + 1), i = n * (n + 1) / 2 := by
   ring
 
 theorem sum_sqr (n : ℕ) : ∑ i in range (n + 1), i ^ 2 = n * (n + 1) * (2 * n + 1) / 6 := by
-  sorry
+  symm
+  apply Nat.div_eq_of_eq_mul_right (by norm_num)
+  induction' n with n h
+  simp only [Nat.zero_eq, zero_add, mul_one, mul_zero, range_one, sum_singleton, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow]
+  calc
+    (n+1) * ((n+1) + 1) * (2 * (n+1) + 1) = n * (n + 1) * (2 * n + 1) + (n+1)*(2*2 + 2*(2*n+1) + 2*n) := by ring
+    _ = n * (n + 1) * (2 * n + 1) + 6*(n+1)^2 := by ring
+    _ = 6 * ∑ i in range (n + 1), i ^ 2 + 6*(n+1)^2 := by rw [h]
+    _ = 6 * (∑ i in range (n + 1), i ^ 2 + (n+1)^2) := by ring
+    _ = 6 * ∑ i in range ((n+1) + 1), i ^ 2 := by nth_rw 2 [Finset.sum_range_succ]
 end
 
 inductive MyNat
