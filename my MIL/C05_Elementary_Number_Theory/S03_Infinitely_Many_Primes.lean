@@ -45,19 +45,24 @@ theorem exists_prime_factor {n : Nat} (h : 2 ≤ n) : ∃ p : Nat, p.Prime ∧ p
 
 theorem primes_infinite : ∀ n, ∃ p > n, Nat.Prime p := by
   intro n
-  have : 2 ≤ Nat.factorial (n + 1) + 1 := by
-    sorry
+  have : 2 ≤ Nat.factorial (n + 1) + 1 := calc
+    2 = 1+1 := by norm_num
+    _ = Nat.factorial 1 + 1 := rfl
+    _ ≤ Nat.factorial (n+1) + 1 := add_le_add_right (Nat.factorial_le (by norm_num)) _
   rcases exists_prime_factor this with ⟨p, pp, pdvd⟩
   refine' ⟨p, _, pp⟩
   show p > n
   by_contra ple
   push_neg  at ple
   have : p ∣ Nat.factorial (n + 1) := by
-    sorry
+    exact (Nat.Prime.dvd_factorial pp).mpr (Nat.le.step ple)
   have : p ∣ 1 := by
-    sorry
+    exact (Nat.dvd_add_right this).mp pdvd
   show False
-  sorry
+  have pe1  : p=1 := by exact Nat.dvd_one.mp this
+  have pne1 : p≠1 := by exact Nat.Prime.ne_one pp
+  exact pne1 pe1
+
 open Finset
 
 section
@@ -90,9 +95,14 @@ section
 variable {α : Type*} [DecidableEq α] (r s t : Finset α)
 
 example : (r ∪ s) ∩ (r ∪ t) = r ∪ s ∩ t := by
-  sorry
+  ext x
+  simp
+  tauto
+
 example : (r \ s) \ t = r \ (s ∪ t) := by
-  sorry
+  ext x
+  simp
+  tauto
 
 end
 
@@ -226,4 +236,3 @@ theorem primes_mod_4_eq_3_infinite : ∀ n, ∃ p > n, Nat.Prime p ∧ p % 4 = 3
   have : p = 3 := by
     sorry
   contradiction
-
