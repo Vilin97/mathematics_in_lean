@@ -1,5 +1,6 @@
 import MIL.Common
 import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Category.GroupCat.Basic
 
 namespace C06S02
 
@@ -15,6 +16,8 @@ structure Group₁ (α : Type*) where
 structure Group₁Cat where
   α : Type*
   str : Group₁ α
+
+#check GroupCat
 
 section
 variable (α β γ : Type*)
@@ -54,8 +57,14 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
   mul_left_inv := Equiv.self_trans_symm
 
 structure AddGroup₁ (α : Type*) where
-  (add : α → α → α)
-  -- fill in the rest
+  add : α → α → α
+  zero : α
+  neg : α → α
+  add_assoc : ∀ a b c, add (add a b) c = add a (add b c)
+  add_zero : ∀ a, add a zero = a
+  zero_add : ∀ a, add zero a = a
+  neg_left_inverse : ∀ a, add (neg a) a = zero
+
 @[ext]
 structure Point where
   x : ℝ
@@ -67,11 +76,29 @@ namespace Point
 def add (a b : Point) : Point :=
   ⟨a.x + b.x, a.y + b.y, a.z + b.z⟩
 
-def neg (a : Point) : Point := sorry
+def neg (a : Point) : Point := ⟨-a.x, -a.y, -a.z⟩
 
-def zero : Point := sorry
+def zero : Point := ⟨0,0,0⟩
 
-def addGroupPoint : AddGroup₁ Point := sorry
+def addGroupPoint : AddGroup₁ Point
+    where
+  add a b := add a b
+  zero := zero
+  neg a := neg a
+  add_assoc := by
+    intro a b c
+    simp [add]
+    ring
+    trivial
+  add_zero := by
+    intro a
+    simp [zero, add]
+  zero_add := by
+    intro a
+    simp [zero, add]
+  neg_left_inverse := by
+    intro a
+    simp [neg, add, zero]
 
 end Point
 
@@ -170,4 +197,44 @@ end
 
 class AddGroup₂ (α : Type*) where
   add : α → α → α
-  -- fill in the rest
+  zero : α
+  neg : α → α
+  add_assoc : ∀ a b c, add (add a b) c = add a (add b c)
+  add_zero : ∀ a, add a zero = a
+  zero_add : ∀ a, add zero a = a
+  neg_left_inverse : ∀ a, add (neg a) a = zero
+
+instance hasAddAddGroup₂ {α : Type*} [AddGroup₂ α] : Add α :=
+  ⟨AddGroup₂.add⟩
+
+instance hasZeroAddGroup₂ {α : Type*} [AddGroup₂ α] : Zero α :=
+  ⟨AddGroup₂.zero⟩
+
+instance hasNegAddGroup₂ {α : Type*} [AddGroup₂ α] : Neg α :=
+  ⟨AddGroup₂.neg⟩
+
+namespace Point
+instance : AddGroup₂ Point
+    where
+  add a b := add a b
+  zero := zero
+  neg a := neg a
+  add_assoc := by
+    intro a b c
+    simp [add]
+    ring
+    trivial
+  add_zero := by
+    intro a
+    simp [zero, add]
+  zero_add := by
+    intro a
+    simp [zero, add]
+  neg_left_inverse := by
+    intro a
+    simp [neg, add, zero]
+
+variable (a b : Point)
+#check a+b
+#check -a
+#check (0 : Point)
